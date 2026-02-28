@@ -3,7 +3,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 public class ProdutoPerecivel extends Produto {
-    private static int tipo = 1;
     private static double DESCONTO = 0.25;
     private static int PRAZO_DESCONTO = 7;
     private LocalDate dataDeValidade;
@@ -38,6 +37,6 @@ public class ProdutoPerecivel extends Produto {
         String precoFormatado = String.format("%2.f", precoCusto).replace(".", ",");
         String margemFormatada = String.format("%2.f", margemLucro).replace(".", ",");
         DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return String.format("1;%s;%2.f;%2.f", descricao, precoFormatado, margemFormatada, this.dataDeValidade.format(formatador));
+        return String.format("2;%s;%2.f;%2.f", descricao, precoFormatado, margemFormatada, this.dataDeValidade.format(formatador));
     }
 }
