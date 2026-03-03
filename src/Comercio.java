@@ -82,11 +82,11 @@ public class Comercio {
                     Produto p = Produto.criarDoTexto(linha);
                     vetorProdutos[quantosProdutos++] = p;
                 } catch (Exception e) {
-                    //Linha errada
+                    // Linha errada
                 }
             }
         } catch (FileNotFoundException e) {
-            //rquivo inexistente
+            // rquivo inexistente
         }
         return vetorProdutos;
     }
@@ -132,12 +132,12 @@ public class Comercio {
      * Factory Method para criação dos objetos.
      */
     static void cadastrarProduto() {
-        System.out.println("Qual o tipo do produto?\n1-Não Perecível, 2- Perecível");
+        System.out.println("Qual o tipo do produto?\n1- Não Perecível, 2- Perecível");
         int param = teclado.nextInt();
         teclado.nextLine();
         if (quantosProdutos >= MAX_NOVOS_PRODUTOS) {
             System.out.println("Erro: Limite máximo de " + MAX_NOVOS_PRODUTOS + " produtos atingido!");
-            return; 
+            return;
         }
 
         if (param > 2 || param < 1) {
@@ -197,7 +197,7 @@ public class Comercio {
             precoDeCusto = teclado.nextDouble();
             System.out.println("Qual a margem de lucro?");
             margemDeLucro = teclado.nextDouble();
-            teclado.nextLine(); // Consome quebra de linha
+            teclado.nextLine();
             margemDeLucro /= 100;
         } catch (Exception e) {
             System.out.println("Dado digitado incorretamente");
@@ -224,10 +224,12 @@ public class Comercio {
             escritor.write("\n");
             for (Produto p : produtosCadastrados) {
                 if (p != null) {
-                    escritor.write(p.gerarDadosTexto());
+                    String dados = p.gerarDadosTexto();
+                    escritor.write(dados);
                     escritor.write("\n");
                 }
             }
+            escritor.flush();
         } catch (IOException e) {
             System.err.println("Erro ao salvar arquivo: " + e.getMessage());
         }
