@@ -52,6 +52,7 @@ public class Comercio {
         System.out.println("1 - Listar todos os produtos");
         System.out.println("2 - Procurar e listar um produto");
         System.out.println("3 - Cadastrar novo produto");
+        System.out.println("4 - ");
         System.out.println("0 - Sair");
         System.out.print("Digite sua opção: ");
         return Integer.parseInt(teclado.nextLine());
@@ -150,13 +151,14 @@ public class Comercio {
         String nome = (String) dados[0];
         double precoDeCusto = (double) dados[1];
         double margemDeLucro = (double) dados[2];
+        int quantidadeEmEstoque = (int) dados[3];
 
         if (param == 1) {
             ProdutoNaoPerecivel p1;
             if (margemDeLucro == 0d) {
-                p1 = new ProdutoNaoPerecivel(nome, precoDeCusto);
+                p1 = new ProdutoNaoPerecivel(nome, precoDeCusto, quantidadeEmEstoque);
             } else {
-                p1 = new ProdutoNaoPerecivel(nome, precoDeCusto, margemDeLucro);
+                p1 = new ProdutoNaoPerecivel(nome, precoDeCusto, margemDeLucro, quantidadeEmEstoque);
             }
             produtosCadastrados[quantosProdutos] = p1;
         } else {
@@ -177,7 +179,7 @@ public class Comercio {
                 pausa();
                 return;
             }
-            p1 = new ProdutoPerecivel(nome, precoDeCusto, margemDeLucro, dataDeValidade);
+            p1 = new ProdutoPerecivel(nome, precoDeCusto, margemDeLucro, dataDeValidade, quantidadeEmEstoque);
             produtosCadastrados[quantosProdutos] = p1;
         }
 
@@ -189,6 +191,7 @@ public class Comercio {
         String nome = "";
         double precoDeCusto = 0d;
         double margemDeLucro = 0d;
+        int quantidadeEmEstoque = 0;
 
         try {
             System.out.println("Qual o nome do produto?");
@@ -199,12 +202,14 @@ public class Comercio {
             margemDeLucro = teclado.nextDouble();
             teclado.nextLine();
             margemDeLucro /= 100;
+            System.out.println("Qual a quantidade em estoque?");
+            quantidadeEmEstoque = teclado.nextInt();
         } catch (Exception e) {
             System.out.println("Dado digitado incorretamente");
             pausa();
         }
 
-        return new Object[] { nome, precoDeCusto, margemDeLucro };
+        return new Object[] { nome, precoDeCusto, margemDeLucro, quantidadeEmEstoque };
     }
 
     /**
@@ -246,11 +251,55 @@ public class Comercio {
                 case 1 -> listarTodosOsProdutos();
                 case 2 -> localizarProdutos();
                 case 3 -> cadastrarProduto();
+                case 4 -> novoPedido();
             }
             pausa();
         } while (opcao != 0);
 
         salvarProdutos(nomeArquivoDados);
         teclado.close();
+    }
+
+    public static void novoPedido() {
+        Pedido pedido = null;
+        int formaDePagamento = 0;
+        System.out.println("Qual a forma de pagamento? 1- A vista, 2- Parcelado");
+        formaDePagamento = teclado.nextInt();
+        LocalDate hora = LocalDate.now();
+        pedido = new Pedido(hora, formaDePagamento);
+        listarTodosOsProdutos();
+        pedido.incluirProduto(comprar());
+        int resp = 0;
+        do {
+            System.out.println("Deseja adicionar outro item? 1- sim, 2- não");
+            resp = teclado.nextInt();
+            if (resp == 1) {
+                pedido.incluirProduto(comprar());
+            }
+        } while (resp != 2);
+
+    }
+
+    private static ItemDePedido comprar() {
+        ItemDePedido p2 = null;
+        try {
+            System.out.println("O que deseja comprar?");
+            String nome = teclado.nextLine();
+            boolean achou = false;
+            for (Produto p : produtosCadastrados) {
+                if (p != null && p.descricao.equalsIgnoreCase(nome)) {
+                    System.out.println("Qual a quantidade?");
+                    int quantidade = teclado.nextInt();
+                    p2 = new ItemDePedido(p, quantidade, p.valorVenda());
+                    achou = true;
+                }
+            }
+            if (!achou) {
+                System.out.println("Produto não encontrado.");
+            }
+        } catch (Exception e) {
+            System.out.println("Ocorreu um erro, tente novamente");
+        }
+        return p2;
     }
 }

@@ -7,19 +7,20 @@ public abstract class Produto {
 	protected String descricao;
 	protected double precoCusto;
 	protected double margemLucro;
+	protected int quantidadeEmEstoque;
 
 	// Construtor com margem de lucro informada
-	protected Produto(String desc, double precoCusto, double margemLucro) {
-		init(desc, precoCusto, margemLucro);
+	protected Produto(String desc, double precoCusto, double margemLucro, int quantidadeEmEstoque) {
+		init(desc, precoCusto, margemLucro, quantidadeEmEstoque);
 	}
 
 	// Construtor utilizando margem padrão
-	protected Produto(String desc, double precoCusto) {
-		init(desc, precoCusto, MARGEM_PADRAO);
+	protected Produto(String desc, double precoCusto, int quantidadeEmEstoque) {
+		init(desc, precoCusto, MARGEM_PADRAO, quantidadeEmEstoque);
 	}
 
 	// Método auxiliar de inicialização
-	private void init(String desc, double precoCusto, double margemLucro) {
+	private void init(String desc, double precoCusto, double margemLucro, int quantidadeEmEstoque) {
 		this.descricao = desc;
 		if (precoCusto <= 0) {
 			throw new IllegalArgumentException();
@@ -29,6 +30,10 @@ public abstract class Produto {
 			throw new IllegalArgumentException();
 		}
 		this.margemLucro = margemLucro;
+		if(quantidadeEmEstoque < 0){
+			throw new IllegalArgumentException();
+		}
+		this.quantidadeEmEstoque = quantidadeEmEstoque;
 	}
 
 	// Calcula o valor de venda com base no custo e na margem
@@ -81,23 +86,52 @@ public abstract class Produto {
 	static Produto criarDoTexto(String linha) {
 		Produto novoProduto = null;
 		String[] linhaSplit = linha.split(";");
-		if(linhaSplit.length < 3){
+		if (linhaSplit.length < 3) {
 			throw new IllegalArgumentException();
 		}
 		int tipo = Integer.parseInt(linhaSplit[0].trim());
 		String desc = linhaSplit[1].trim();
 		double precoCusto = Double.parseDouble(linhaSplit[2].trim());
-		double margemLucro =  Double.parseDouble(linhaSplit[3].trim());
+		double margemLucro = Double.parseDouble(linhaSplit[3].trim());
+		int quantidadeEmEstoque = Integer.parseInt(linhaSplit[4].trim());
 
-		if(tipo == 1){
-			novoProduto = new ProdutoNaoPerecivel(desc, precoCusto, margemLucro);
-		}else{
+		if (tipo == 1) {
+			novoProduto = new ProdutoNaoPerecivel(desc, precoCusto, margemLucro, quantidadeEmEstoque);
+		} else {
 			String dataStr = linhaSplit[4].trim();
 			DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			LocalDate dataValidade = LocalDate.parse(dataStr, formatador);
-			novoProduto = new ProdutoPerecivel(desc, precoCusto, margemLucro, dataValidade);
+			novoProduto = new ProdutoPerecivel(desc, precoCusto, margemLucro, dataValidade, quantidadeEmEstoque);
 		}
 
 		return novoProduto;
+	}
+
+	public int getquantidadeEmEstoque() {
+		return quantidadeEmEstoque;
+	}
+
+	public int setquantidadeEmEstoque(int quantidade) {
+		if (quantidade < 0) {
+			throw new IllegalArgumentException();
+		}
+		quantidadeEmEstoque = quantidade;
+		return quantidadeEmEstoque;
+	}
+
+	public boolean verificaSePodeReduzir(int quantidade){
+		boolean param = true;
+		if (quantidade > quantidadeEmEstoque || quantidade < 0) {
+			param = false;
+		}
+		return param;
+	}
+
+	public void reduzirEstoque(int quantidade) {
+		if (verificaSePodeReduzir(quantidade)) {
+			quantidadeEmEstoque -= quantidade;
+		}else{
+			throw new IllegalArgumentException();
+		}
 	}
 }

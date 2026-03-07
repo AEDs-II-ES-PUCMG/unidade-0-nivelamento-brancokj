@@ -7,8 +7,8 @@ public class ProdutoPerecivel extends Produto {
     private static int PRAZO_DESCONTO = 7;
     private LocalDate dataDeValidade;
 
-    public ProdutoPerecivel(String desc, double precoCusto, double margemLucro, LocalDate validade) {
-        super(desc, precoCusto, margemLucro);
+    public ProdutoPerecivel(String desc, double precoCusto, double margemLucro, LocalDate validade, int quantidadeEmEstoque) {
+        super(desc, precoCusto, margemLucro, quantidadeEmEstoque);
         if (validade.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException();
         }
@@ -37,7 +37,7 @@ public class ProdutoPerecivel extends Produto {
         DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String precoFormatado = String.format("%.2f", precoCusto).replace(".", ",");
         String margemFormatada = String.format("%.2f", margemLucro).replace(".", ",");
-        return String.format("2;%s;%s;%s;%s", descricao, precoFormatado, margemFormatada,
-                this.dataDeValidade.format(formatador));
+        return String.format("2;%s;%s;%s;%s;%i", descricao, precoFormatado, margemFormatada,
+                this.dataDeValidade.format(formatador), getquantidadeEmEstoque());
     }
 }
